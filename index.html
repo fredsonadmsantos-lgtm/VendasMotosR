@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FREDSON MOTOS E SERVIÇOS - Sistema Integrado de Gestão</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            black: '#121212',
+                            dark: '#1e1e24',
+                            card: '#282830',
+                            yellow: '#f59e0b',
+                            amber: '#d97706',
+                            hover: '#fbbf24'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #121212;
+            color: #f3f4f6;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e1e24;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #f59e0b;
+        }
+        .glass-panel {
+            background: rgba(40, 40, 48, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printable-receipt, #printable-receipt * {
+                visibility: visible;
+            }
+            #printable-receipt {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: white;
+                color: black;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden bg-brand-black text-gray-100">
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="w-64 bg-brand-dark flex flex-col justify-between border-r border-gray-800 transition-all duration-300 z-30">
+        <div>
+            <!-- Header Brand -->
+            <div class="p-4 border-b border-gray-800 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-brand-amber to-brand-yellow flex items-center justify-center text-black font-extrabold text-xl shadow-lg shadow-amber-500/20">
+                        FM
+                    </div>
+                    <div>
+                        <h1 class="font-extrabold tracking-wider text-sm text-brand-yellow leading-tight">FREDSON MOTOS</h1>
+                        <p class="text-xs text-gray-400 font-medium">E SERVIÇOS</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Info Banner -->
+            <div class="m-3 p-3 rounded-lg bg-brand-card/70 border border-gray-700/50 flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <div id="user-avatar" class="w-8 h-8 rounded-full bg-brand-yellow text-black flex items-center justify-center font-bold text-xs">
+                        P
+                    </div>
+                    <div>
+                        <p id="user-name" class="text-xs font-semibold text-white">Fredson (Dono)</p>
+                        <span id="user-badge" class="inline-block text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-brand-yellow font-medium">
+                            Proprietário
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="px-3 py-2 space-y-1">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-gray-800 text-gray-300">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5 text-brand-yellow"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button onclick="switchTab('pdv')" id="nav-pdv" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-gray-800 text-gray-300">
+                    <i data-lucide="shopping-cart" class="w-5 h-5 text-brand-yellow"></i>
+                    <span>PDV - Balcão</span>
+                </button>
+                <button onclick="switchTab('pecas')" id="nav-pecas" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-gray-800 text-gray-300">
+                    <i data-lucide="package" class="w-5 h-5 text-brand-yellow"></i>
+                    <span>Estoque de Peças</span>
+                </button>
+                <button onclick="switchTab('motos')" id="nav-motos" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-gray-800 text-gray-300">
+                    <i data-lucide="bike" class="w-5 h-5 text-brand-yellow"></i>
+                    <span>Motos Novas & Usadas</span>
+                </button>
+                <button onclick="switchTab('os')" id="nav-os" class="nav-btn w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-gray-800 text-gray-300">
+                    <i data-lucide="wrench" class="w-5 h-5 text-brand-yellow"></i>
+                    <span>Ordens de Serviço</span>
+                </button>
+                <button onclick="switchTab('relatorios')" id="nav-relatorios" class="nav-btn owner-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-gray-800 text-gray-300">
+                    <i data-lucide="bar-chart-3" class="w-5 h-5 text-brand-yellow"></i>
+                    <span>Relatórios Financeiros</span>
+                </button>
+                <button onclick="switchTab('equipe')" id="nav-equipe" class="nav-btn owner-only w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors hover:bg-gray-800 text-gray-300">
+                    <i data-lucide="users" class="w-5 h-5 text-brand-yellow"></i>
+                    <span>Equipe & Permissões</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Toggle Profile & Footer -->
+        <div class="p-3 border-t border-gray-800 space-y-2">
+            <button onclick="toggleUserRole()" class="w-full py-2 px-3 rounded-lg bg-gray-800 hover:bg-gray-700 text-xs font-semibold text-gray-200 flex items-center justify-between transition">
+                <span class="flex items-center space-x-2">
+                    <i data-lucide="user-cog" class="w-4 h-4 text-brand-yellow"></i>
+                    <span>Alternar Perfil</span>
+                </span>
+                <i data-lucide="repeat" class="w-3.5 h-3.5 text-gray-400"></i>
+            </button>
+            <div class="text-center text-[10px] text-gray-500 pt-1">
+                FREDSON MOTOS v2.5 &copy; 2026
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+
+        <!-- TOP BAR -->
+        <header class="h-16 bg-brand-dark border-b border-gray-800 flex items-center justify-between px-6 z-10">
+            <div class="flex items-center space-x-4">
+                <button id="toggle-sidebar-btn" onclick="toggleSidebar()" class="text-gray-400 hover:text-white focus:outline-none">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+                <h2 id="current-page-title" class="text-lg font-bold text-white tracking-wide">Dashboard Geral</h2>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <!-- Status da Loja / Modos -->
+                <div class="hidden sm:flex items-center space-x-2 bg-gray-900/80 px-3 py-1.5 rounded-full border border-gray-800 text-xs">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="text-gray-300 font-medium">Sistema On-line (Local)</span>
+                </div>
+                <div class="text-right">
+                    <div id="clock-date" class="text-xs font-bold text-brand-yellow">00/00/0000 - 00:00</div>
+                    <div id="user-role-label" class="text-[11px] text-gray-400">Logado como: Proprietário</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- MAIN VIEW CONTAINER -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6 bg-brand-black">
+
+            <!-- 1. DASHBOARD VIEW -->
+            <section id="view-dashboard" class="tab-content space-y-6">
+                <!-- Stat Cards Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="glass-panel p-4 rounded-xl border border-gray-800 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-gray-400 uppercase tracking-wider">Faturamento Hoje</p>
+                            <h3 id="dash-faturamento-dia" class="text-2xl font-black text-emerald-400 mt-1">R$ 0,00</h3>
+                            <p class="text-[11px] text-gray-500 mt-1">Vendas & Serviços</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+                            <i data-lucide="dollar-sign" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-4 rounded-xl border border-gray-800 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-gray-400 uppercase tracking-wider">Motos em Estoque</p>
+                            <h3 id="dash-motos-count" class="text-2xl font-black text-brand-yellow mt-1">0</h3>
+                            <p class="text-[11px] text-gray-500 mt-1"><span id="dash-motos-val">R$ 0</span> em patrimônio</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-brand-yellow flex items-center justify-center">
+                            <i data-lucide="bike" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-4 rounded-xl border border-gray-800 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-gray-400 uppercase tracking-wider">Total de Peças</p>
+                            <h3 id="dash-pecas-count" class="text-2xl font-black text-blue-400 mt-1">0</h3>
+                            <p class="text-[11px] text-gray-500 mt-1">Cadastradas no sistema</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center">
+                            <i data-lucide="boxes" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-4 rounded-xl border border-gray-800 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-gray-400 uppercase tracking-wider">Alertas Estoque Baixo</p>
+                            <h3 id="dash-alerta-count" class="text-2xl font-black text-red-400 mt-1">0</h3>
+                            <p class="text-[11px] text-gray-500 mt-1">Itens c/ menos de 5 un.</p>
+                        </div>
+                        <div class="w-12 h-12 rounded-xl bg-red-500/10 text-red-400 flex items-center justify-center">
+                            <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions & Status -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Ultimas Vendas Realizadas -->
+                    <div class="lg:col-span-2 glass-panel p-5 rounded-xl border border-gray-800">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-gray-100 flex items-center gap-2">
+                                <i data-lucide="history" class="w-5 h-5 text-brand-yellow"></i>
+                                Últimas Transações
+                            </h3>
+                            <button onclick="switchTab('relatorios')" class="text-xs text-brand-yellow hover:underline">Ver todas</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead class="bg-gray-800/60 text-gray-400 uppercase font-semibold">
+                                    <tr>
+                                        <th class="p-3 rounded-l">Data/Hora</th>
+                                        <th class="p-3">Tipo</th>
+                                        <th class="p-3">Cliente / Descrição</th>
+                                        <th class="p-3">Atendente</th>
+                                        <th class="p-3 rounded-r text-right">Valor Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dash-recent-sales" class="divide-y divide-gray-800">
+                                    <!-- Dynamic Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Alertas de Baixo Estoque lista -->
+                    <div class="glass-panel p-5 rounded-xl border border-gray-800">
+                        <h3 class="font-bold text-gray-100 flex items-center gap-2 mb-4">
+                            <i data-lucide="shield-alert" class="w-5 h-5 text-red-400"></i>
+                            Reposição Urgente
+                        </h3>
+                        <div id="dash-low-stock-list" class="space-y-3 max-h-[320px] overflow-y-auto pr-1">
+                            <!-- Dynamic items -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. PDV BALCÃO VIEW -->
+            <section id="view-pdv" class="tab-content hidden h-full">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+                    <!-- Catalogo de Busca e Itens -->
+                    <div class="lg:col-span-2 flex flex-col space-y-4">
+                        <div class="glass-panel p-4 rounded-xl border border-gray-800 flex flex-col sm:flex-row gap-3 justify-between items-center">
+                            <div class="relative w-full sm:w-96">
+                                <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-gray-400"></i>
+                                <input type="text" id="pdv-search" onkeyup="filterPdvItems()" placeholder="Buscar por código, nome ou marca..." class="w-full bg-gray-900 border border-gray-700 rounded-lg pl-9 pr-4 py-2 text-sm text-gray-100 focus:outline-none focus:border-brand-yellow">
+                            </div>
+                            <div class="flex gap-2 w-full sm:w-auto">
+                                <button onclick="setPdvCategory('all')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-yellow text-black">Todos</button>
+                                <button onclick="setPdvCategory('peca')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-800 text-gray-300 hover:bg-gray-700">Peças</button>
+                                <button onclick="setPdvCategory('servico')" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-gray-800 text-gray-300 hover:bg-gray-700">Serviços</button>
+                            </div>
+                        </div>
+
+                        <!-- Grid de Produtos Disponíveis -->
+                        <div id="pdv-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 overflow-y-auto max-h-[calc(100vh-250px)] pr-1">
+                            <!-- Items populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Carrinho e Checkout -->
+                    <div class="glass-panel p-4 rounded-xl border border-gray-800 flex flex-col justify-between h-full">
+                        <div>
+                            <div class="flex items-center justify-between pb-3 border-b border-gray-800 mb-3">
+                                <h3 class="font-bold text-white flex items-center gap-2">
+                                    <i data-lucide="shopping-bag" class="w-5 h-5 text-brand-yellow"></i>
+                                    Carrinho de Venda
+                                </h3>
+                                <button onclick="clearCart()" class="text-xs text-red-400 hover:underline">Limpar</button>
+                            </div>
+
+                            <!-- Cliente Info (Opcional) -->
+                            <div class="mb-3">
+                                <input type="text" id="pdv-cliente-nome" placeholder="Nome do Cliente (Opcional)" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-200 focus:outline-none focus:border-brand-yellow">
+                            </div>
+
+                            <!-- Lista do Carrinho -->
+                            <div id="pdv-cart-items" class="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+                                <!-- Dynamic Cart Items -->
+                                <p class="text-xs text-gray-500 text-center py-8">Nenhum item adicionado ao carrinho.</p>
+                            </div>
+                        </div>
+
+                        <!-- Resumo financeiro do carrinho -->
+                        <div class="border-t border-gray-800 pt-3 space-y-3">
+                            <div class="space-y-1 text-xs">
+                                <div class="flex justify-between text-gray-400">
+                                    <span>Subtotal:</span>
+                                    <span id="cart-subtotal">R$ 0,00</span>
+                                </div>
+                                <div class="flex justify-between text-gray-400 items-center">
+                                    <span>Desconto (R$):</span>
+                                    <input type="number" id="cart-discount" value="0" min="0" onchange="updateCartTotals()" class="w-20 bg-gray-900 border border-gray-700 text-right text-xs px-2 py-0.5 rounded text-white focus:outline-none">
+                                </div>
+                                <div class="flex justify-between text-lg font-black text-white pt-2 border-t border-gray-800">
+                                    <span>Total Geral:</span>
+                                    <span id="cart-total" class="text-brand-yellow">R$ 0,00</span>
+                                </div>
+                            </div>
+
+                            <!-- Forma de Pagamento -->
+                            <div>
+                                <label class="block text-[11px] font-medium text-gray-400 mb-1">Forma de Pagamento</label>
+                                <select id="cart-payment-method" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-xs text-gray-200 focus:outline-none focus:border-brand-yellow">
+                                    <option value="Dinheiro">Dinheiro</option>
+                                    <option value="PIX">PIX</option>
+                                    <option value="Cartão de Débito">Cartão de Débito</option>
+                                    <option value="Cartão de Crédito">Cartão de Crédito</option>
+                                </select>
+                            </div>
+
+                            <button onclick="finalizeSale()" class="w-full py-3 bg-gradient-to-r from-brand-amber to-brand-yellow hover:from-amber-600 hover:to-amber-500 text-black font-extrabold rounded-lg shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2 transition transform active:scale-95">
+                                <i data-lucide="check-circle" class="w-5 h-5"></i>
+                                FINALIZAR VENDA (F9)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. ESTOQUE DE PEÇAS VIEW -->
+            <section id="view-pecas" class="tab-content hidden space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div class="relative w-full sm:w-80">
+                        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-gray-400"></i>
+                        <input type="text" id="pecas-search-input" onkeyup="renderPecasTable()" placeholder="Buscar peças por nome/código..." class="w-full bg-gray-900 border border-gray-700 rounded-lg pl-9 pr-4 py-2 text-sm text-gray-100 focus:outline-none focus:border-brand-yellow">
+                    </div>
+                    <button onclick="openPecaModal()" class="w-full sm:w-auto px-4 py-2 bg-brand-yellow text-black font-bold rounded-lg hover:bg-brand-hover transition flex items-center justify-center gap-2 text-sm shadow-md">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        Nova Peça / Item
+                    </button>
+                </div>
+
+                <div class="glass-panel rounded-xl border border-gray-800 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-gray-800/80 text-gray-400 uppercase text-xs">
+                                <tr>
+                                    <th class="p-3">Código</th>
+                                    <th class="p-3">Descrição da Peça</th>
+                                    <th class="p-3">Marca / Aplicação</th>
+                                    <th class="p-3 text-right">Qtd Estoque</th>
+                                    <th class="p-3 text-right">Preço Custo</th>
+                                    <th class="p-3 text-right">Preço Venda</th>
+                                    <th class="p-3 text-center">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pecas-table-body" class="divide-y divide-gray-800 text-gray-200">
+                                <!-- Dynamic Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. MOTOS NOVAS E USADAS VIEW -->
+            <section id="view-motos" class="tab-content hidden space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <select id="motos-filter-status" onchange="renderMotosGrid()" class="bg-gray-900 border border-gray-700 text-xs rounded-lg px-3 py-2 text-gray-200">
+                            <option value="ALL">Todas as Motos</option>
+                            <option value="Disponível">Disponíveis</option>
+                            <option value="Vendida">Vendidas</option>
+                            <option value="Em Manutenção">Em Manutenção</option>
+                        </select>
+                    </div>
+                    <button onclick="openMotoModal()" class="w-full sm:w-auto px-4 py-2 bg-brand-yellow text-black font-bold rounded-lg hover:bg-brand-hover transition flex items-center justify-center gap-2 text-sm shadow-md">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        Cadastrar Moto (Compra/Entrada)
+                    </button>
+                </div>
+
+                <!-- Cards Grid Motos -->
+                <div id="motos-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Dynamic Moto Cards -->
+                </div>
+            </section>
+
+            <!-- 5. ORDENS DE SERVIÇO (OS) VIEW -->
+            <section id="view-os" class="tab-content hidden space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-bold text-gray-200 text-sm uppercase tracking-wider">Gestão de Serviços da Oficina</h3>
+                    <button onclick="openOsModal()" class="px-4 py-2 bg-brand-yellow text-black font-bold rounded-lg hover:bg-brand-hover transition flex items-center gap-2 text-sm shadow-md">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        Abrir Nova O.S.
+                    </button>
+                </div>
+
+                <div class="glass-panel rounded-xl border border-gray-800 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-gray-800/80 text-gray-400 uppercase text-xs">
+                                <tr>
+                                    <th class="p-3">Nº O.S.</th>
+                                    <th class="p-3">Cliente / Telefone</th>
+                                    <th class="p-3">Moto / Placa</th>
+                                    <th class="p-3">Serviço Solicitado</th>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3 text-right">Valor Est.</th>
+                                    <th class="p-3 text-center">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="os-table-body" class="divide-y divide-gray-800 text-gray-200">
+                                <!-- Dynamic OS Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. RELATÓRIOS FINANCEIROS VIEW (Proprietário) -->
+            <section id="view-relatorios" class="tab-content hidden space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="glass-panel p-4 rounded-xl border border-gray-800">
+                        <p class="text-xs text-gray-400">Total Faturado no Período</p>
+                        <h4 id="rel-total-faturado" class="text-2xl font-black text-emerald-400 mt-1">R$ 0,00</h4>
+                    </div>
+                    <div class="glass-panel p-4 rounded-xl border border-gray-800">
+                        <p class="text-xs text-gray-400">Lucro Estimado de Peças</p>
+                        <h4 id="rel-lucro-estimado" class="text-2xl font-black text-brand-yellow mt-1">R$ 0,00</h4>
+                    </div>
+                    <div class="glass-panel p-4 rounded-xl border border-gray-800">
+                        <p class="text-xs text-gray-400">Total de Transações</p>
+                        <h4 id="rel-qtd-vendas" class="text-2xl font-black text-blue-400 mt-1">0</h4>
+                    </div>
+                </div>
+
+                <!-- Tabela completa do histórico -->
+                <div class="glass-panel rounded-xl border border-gray-800 p-4">
+                    <h3 class="font-bold text-gray-100 mb-3">Histórico Detalhado de Operações</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-gray-800/80 text-gray-400 uppercase">
+                                <tr>
+                                    <th class="p-2.5">ID Venda</th>
+                                    <th class="p-2.5">Data / Hora</th>
+                                    <th class="p-2.5">Cliente</th>
+                                    <th class="p-2.5">Pagamento</th>
+                                    <th class="p-2.5">Operador</th>
+                                    <th class="p-2.5 text-right">Valor Total</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rel-historico-body" class="divide-y divide-gray-800 text-gray-300">
+                                <!-- Dynamic Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7. GESTÃO DE EQUIPE VIEW (Proprietário) -->
+            <section id="view-equipe" class="tab-content hidden space-y-4">
+                <div class="glass-panel p-5 rounded-xl border border-gray-800">
+                    <h3 class="font-bold text-gray-100 mb-2">Controle de Perfis & Acessos da Fredson Motos</h3>
+                    <p class="text-xs text-gray-400 mb-4">Alternar entre perfis altera os acessos no menu e as permissões de relatórios sigilosos.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 rounded-lg bg-gray-900 border border-amber-500/30 flex items-center justify-between">
+                            <div>
+                                <h4 class="font-bold text-brand-yellow text-sm">Perfil: Proprietário (Fredson)</h4>
+                                <p class="text-xs text-gray-400 mt-1">Acesso completo: Vendas, Estoque, Motos, Ordens de Serviço, Lucros e Relatórios Financeiros.</p>
+                            </div>
+                            <span class="px-2.5 py-1 bg-amber-500/20 text-brand-yellow rounded text-xs font-bold">MASTER</span>
+                        </div>
+
+                        <div class="p-4 rounded-lg bg-gray-900 border border-gray-700 flex items-center justify-between">
+                            <div>
+                                <h4 class="font-bold text-white text-sm">Perfil: Funcionário / Balcão</h4>
+                                <p class="text-xs text-gray-400 mt-1">Acesso restrito: Realizar Vendas PDV, Consultar Peças e Atualizar Ordens de Serviço.</p>
+                            </div>
+                            <span class="px-2.5 py-1 bg-gray-800 text-gray-400 rounded text-xs font-bold">OPERATOR</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- MODAIS (FORMS) -->
+
+    <!-- 1. MODAL PEÇA (ADICIONAR/EDITAR) -->
+    <div id="modal-peca" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-brand-dark border border-gray-700 rounded-xl w-full max-w-md p-6 shadow-2xl relative">
+            <h3 id="modal-peca-title" class="text-lg font-bold text-brand-yellow mb-4">Cadastrar Nova Peça</h3>
+            <form id="form-peca" onsubmit="savePeca(event)" class="space-y-3">
+                <input type="hidden" id="peca-id">
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Código de Barras / Ref</label>
+                    <input type="text" id="peca-codigo" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-yellow focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Nome / Descrição do Item</label>
+                    <input type="text" id="peca-nome" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-yellow focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Marca / Modelo Compatível</label>
+                    <input type="text" id="peca-marca" required placeholder="Ex: Honda Titan 160 / Cobreq" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-yellow focus:outline-none">
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Qtd Estoque</label>
+                        <input type="number" id="peca-qtd" required min="0" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-yellow focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Preço Custo</label>
+                        <input type="number" id="peca-cost" step="0.01" required min="0" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-yellow focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Preço Venda</label>
+                        <input type="number" id="peca-price" step="0.01" required min="0" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-yellow focus:outline-none">
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 pt-4">
+                    <button type="button" onclick="closeModal('modal-peca')" class="px-4 py-2 bg-gray-800 text-gray-300 rounded-lg text-xs font-semibold hover:bg-gray-700">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-brand-yellow text-black font-bold rounded-lg text-xs hover:bg-brand-hover">Salvar Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. MODAL MOTO (COMPRA / CADASTRO) -->
+    <div id="modal-moto" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-brand-dark border border-gray-700 rounded-xl w-full max-w-lg p-6 shadow-2xl relative">
+            <h3 id="modal-moto-title" class="text-lg font-bold text-brand-yellow mb-4">Cadastrar Moto (Entrada/Estoque)</h3>
+            <form id="form-moto" onsubmit="saveMoto(event)" class="space-y-3">
+                <input type="hidden" id="moto-id">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Marca / Fabricante</label>
+                        <input type="text" id="moto-marca" placeholder="Honda, Yamaha..." required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-yellow focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Modelo</label>
+                        <input type="text" id="moto-modelo" placeholder="CG 160 Fan, XRE 300..." required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-yellow focus:outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Ano / Modelo</label>
+                        <input type="text" id="moto-ano" placeholder="2022/2023" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-yellow focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Cor</label>
+                        <input type="text" id="moto-cor" placeholder="Vermelha" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-yellow focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Condição</label>
+                        <select id="moto-condicao" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-2 py-2 text-sm text-white focus:border-brand-yellow focus:outline-none">
+                            <option value="Usada">Usada</option>
+                            <option value="Nova 0km">Nova 0km</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Placa</label>
+                        <input type="text" id="moto-placa" placeholder="ABC-1D23" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-yellow focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Nº Chassi (Opcional)</label>
+                        <input type="text" id="moto-chassi" placeholder="9BW..." class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-yellow focus:outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Valor de Compra (R$)</label>
+                        <input type="number" id="moto-compra" step="0.01" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-yellow focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Valor de Venda (R$)</label>
+                        <input type="number" id="moto-venda" step="0.01" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-yellow focus:outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Status no Pátio</label>
+                    <select id="moto-status" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-yellow focus:outline-none">
+                        <option value="Disponível">Disponível para Venda</option>
+                        <option value="Em Manutenção">Em Manutenção / Revisão</option>
+                        <option value="Vendida">Vendida</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-2 pt-4">
+                    <button type="button" onclick="closeModal('modal-moto')" class="px-4 py-2 bg-gray-800 text-gray-300 rounded-lg text-xs font-semibold hover:bg-gray-700">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-brand-yellow text-black font-bold rounded-lg text-xs hover:bg-brand-hover">Salvar Moto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. MODAL ORDEM DE SERVIÇO -->
+    <div id="modal-os" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-brand-dark border border-gray-700 rounded-xl w-full max-w-lg p-6 shadow-2xl relative">
+            <h3 id="modal-os-title" class="text-lg font-bold text-brand-yellow mb-4">Nova Ordem de Serviço (O.S.)</h3>
+            <form id="form-os" onsubmit="saveOs(event)" class="space-y-3">
+                <input type="hidden" id="os-id">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Nome do Cliente</label>
+                        <input type="text" id="os-cliente" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-yellow focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Telefone / Whats</label>
+                        <input type="text" id="os-fone" required placeholder="(88) 9......." class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-yellow focus:outline-none">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Modelo Moto / Ano</label>
+                        <input type="text" id="os-moto" required placeholder="Bros 160 2020" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-yellow focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Placa da Moto</label>
+                        <input type="text" id="os-placa" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-yellow focus:outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Descrição do Serviço / Defeito Relatado</label>
+                    <textarea id="os-descricao" rows="3" required placeholder="Troca de óleo, regulagem de válvulas, troca de patim de freio..." class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-yellow focus:outline-none"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Valor Estimado Total (R$)</label>
+                        <input type="number" id="os-valor" step="0.01" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-yellow focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Status da O.S.</label>
+                        <select id="os-status" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:border-brand-yellow focus:outline-none">
+                            <option value="Em Aberto">Em Aberto</option>
+                            <option value="Em Andamento">Em Andamento</option>
+                            <option value="Aguardando Peça">Aguardando Peça</option>
+                            <option value="Concluído">Concluído</option>
+                            <option value="Entregue">Entregue / Pago</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 pt-4">
+                    <button type="button" onclick="closeModal('modal-os')" class="px-4 py-2 bg-gray-800 text-gray-300 rounded-lg text-xs font-semibold hover:bg-gray-700">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-brand-yellow text-black font-bold rounded-lg text-xs hover:bg-brand-hover">Salvar O.S.</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 4. MODAL COMPROVANTE DE VENDA (CUPOM NÃO FISCAL) -->
+    <div id="modal-receipt" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-white text-black rounded-xl w-full max-w-sm p-6 shadow-2xl relative">
+            <div id="printable-receipt" class="text-xs font-mono space-y-3">
+                <div class="text-center border-b pb-2">
+                    <h2 class="font-bold text-base uppercase">FREDSON MOTOS E SERVIÇOS</h2>
+                    <p class="text-[10px]">Oficina & Moto Peças Especializada</p>
+                    <p class="text-[10px]">Rua Principal, Centro - Contato: (88) 99999-0000</p>
+                    <p class="text-[10px] mt-1 text-gray-500">------------------------------------</p>
+                    <p class="font-bold text-xs mt-1">COMPROVANTE DE VENDA</p>
+                </div>
+
+                <div class="space-y-1">
+                    <div class="flex justify-between"><span class="text-gray-600">Data:</span> <span id="rec-date"></span></div>
+                    <div class="flex justify-between"><span class="text-gray-600">Cod Venda:</span> <span id="rec-id"></span></div>
+                    <div class="flex justify-between"><span class="text-gray-600">Cliente:</span> <span id="rec-cliente"></span></div>
+                    <div class="flex justify-between"><span class="text-gray-600">Atendente:</span> <span id="rec-atendente"></span></div>
+                </div>
+
+                <div class="border-t border-b py-2 my-2">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="font-bold border-b">
+                                <th>Item</th>
+                                <th class="text-center">Qtd</th>
+                                <th class="text-right">Subt.</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rec-items-list" class="divide-y divide-gray-200">
+                            <!-- Rec Items -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="space-y-1 text-right">
+                    <div class="flex justify-between"><span>Subtotal:</span> <span id="rec-subtotal"></span></div>
+                    <div class="flex justify-between"><span>Desconto:</span> <span id="rec-desconto"></span></div>
+                    <div class="flex justify-between text-sm font-bold pt-1 border-t"><span>TOTAL:</span> <span id="rec-total"></span></div>
+                    <div class="flex justify-between text-[11px] text-gray-600"><span>Forma Pagto:</span> <span id="rec-pagto"></span></div>
+                </div>
+
+                <div class="text-center pt-3 border-t text-[10px] text-gray-500">
+                    <p>Obrigado pela preferência!</p>
+                    <p>Garantia de Peças e Serviços com apresentação deste comprovante.</p>
+                </div>
+            </div>
+
+            <div class="flex gap-2 justify-end mt-4 pt-2 border-t border-gray-200">
+                <button onclick="closeModal('modal-receipt')" class="px-3 py-1.5 bg-gray-300 text-gray-800 rounded text-xs font-bold hover:bg-gray-400">Fechar</button>
+                <button onclick="window.print()" class="px-3 py-1.5 bg-brand-yellow text-black rounded text-xs font-bold hover:bg-brand-hover flex items-center gap-1">
+                    <i data-lucide="printer" class="w-3.5 h-3.5"></i> Imprimir
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // DATA INITIALIZATION & LOCALSTORAGE
+        const DEFAULT_PECAS = [
+            { id: 1, codigo: '789001', nome: 'Óleo Havoline 20W50 1L', marca: 'Havoline', qtd: 24, cost: 18.00, price: 30.00, tipo: 'peca' },
+            { id: 2, codigo: '789002', nome: 'Kit Relação (Coroa/Pinhao/Corrente)', marca: 'Riffel Titan 160', qtd: 8, cost: 85.00, price: 140.00, tipo: 'peca' },
+            { id: 3, codigo: '789003', nome: 'Pastilha de Freio Dianteira', marca: 'Cobreq Bros 160', qtd: 3, cost: 15.00, price: 35.00, tipo: 'peca' },
+            { id: 4, codigo: '789004', nome: 'Pneu Dianteiro 80/100-18', marca: 'Vipal St300', qtd: 5, cost: 110.00, price: 180.00, tipo: 'peca' },
+            { id: 5, codigo: 'SERV01', nome: 'Mão de Obra: Troca de Óleo e Filtro', marca: 'Serviço Geral', qtd: 999, cost: 0.00, price: 15.00, tipo: 'servico' },
+            { id: 6, codigo: 'SERV02', nome: 'Revisão Completa de Freios e Relação', marca: 'Serviço Geral', qtd: 999, cost: 0.00, price: 80.00, tipo: 'servico' }
+        ];
+
+        const DEFAULT_MOTOS = [
+            { id: 101, marca: 'Honda', modelo: 'CG 160 Titan ESD', ano: '2022/2022', cor: 'Vermelha', condicao: 'Usada', placa: 'POX-4A12', chassi: '9BW12345678901234', compra: 11500.00, venda: 14800.00, status: 'Disponível' },
+            { id: 102, marca: 'Yamaha', modelo: 'FAZER FZ25 ABS', ano: '2023/2024', cor: 'Azul', condicao: 'Usada', placa: 'RTY-9B88', chassi: '9BW98765432109876', compra: 17000.00, venda: 21500.00, status: 'Disponível' },
+            { id: 103, marca: 'Honda', modelo: 'NXR 160 Bros ESDD', ano: '2024/2024', cor: 'Preta', condicao: 'Nova 0km', placa: 'Ainda S/ Placa', chassi: '9BW00011122233344', compra: 19800.00, venda: 23200.00, status: 'Disponível' }
+        ];
+
+        const DEFAULT_OS = [
+            { id: 501, cliente: 'Carlos Eduardo', fone: '(88) 99823-1122', moto: 'Titan 150 2014', placa: 'HYU-1200', descricao: 'Barulho no motor e regulagem de freio', valor: 150.00, status: 'Em Andamento' },
+            { id: 502, cliente: 'Maria Socorro', fone: '(88) 98844-3311', moto: 'Bros 160', placa: 'PNG-4421', descricao: 'Troca de kit transmissão e óleo', valor: 175.00, status: 'Concluído' }
+        ];
+
+        // State storage
+        let pecas = JSON.parse(localStorage.getItem('fm_pecas')) || DEFAULT_PECAS;
+        let motos = JSON.parse(localStorage.getItem('fm_motos')) || DEFAULT_MOTOS;
+        let ordensServico = JSON.parse(localStorage.getItem('fm_os')) || DEFAULT_OS;
+        let vendas = JSON.parse(localStorage.getItem('fm_vendas')) || [];
+
+        // Global User Role: 'PROPRIETARIO' or 'FUNCIONARIO'
+        let currentUserRole = localStorage.getItem('fm_role') || 'PROPRIETARIO';
+        let currentCart = [];
+        let activePdvCategory = 'all';
+
+        // INITIALIZATION
+        window.onload = function() {
+            updateClock();
+            setInterval(updateClock, 1000);
+            applyUserRoleUI();
+            switchTab('dashboard');
+            lucide.createIcons();
+        };
+
+        function saveData() {
+            localStorage.setItem('fm_pecas', JSON.stringify(pecas));
+            localStorage.setItem('fm_motos', JSON.stringify(motos));
+            localStorage.setItem('fm_os', JSON.stringify(ordensServico));
+            localStorage.setItem('fm_vendas', JSON.stringify(vendas));
+            localStorage.setItem('fm_role', currentUserRole);
+        }
+
+        function updateClock() {
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('pt-BR') + ' - ' + now.toLocaleTimeString('pt-BR');
+            document.getElementById('clock-date').innerText = dateStr;
+        }
+
+        // ROLE MANAGEMENT
+        function toggleUserRole() {
+            currentUserRole = (currentUserRole === 'PROPRIETARIO') ? 'FUNCIONARIO' : 'PROPRIETARIO';
+            saveData();
+            applyUserRoleUI();
+            switchTab('dashboard');
+        }
+
+        function applyUserRoleUI() {
+            const isOwner = currentUserRole === 'PROPRIETARIO';
+            
+            document.getElementById('user-name').innerText = isOwner ? 'Fredson (Dono)' : 'Atendente Balcão';
+            document.getElementById('user-badge').innerText = isOwner ? 'Proprietário' : 'Funcionário';
+            document.getElementById('user-avatar').innerText = isOwner ? 'P' : 'F';
+            document.getElementById('user-role-label').innerText = 'Logado como: ' + (isOwner ? 'Proprietário' : 'Funcionário');
+
+            // Hide/Show owner only items
+            const ownerElements = document.querySelectorAll('.owner-only');
+            ownerElements.forEach(el => {
+                if (isOwner) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+        }
+
+        // NAVIGATION TAB SWITCHING
+        function switchTab(tabId) {
+            // Guard clause for owner tabs
+            if ((tabId === 'relatorios' || tabId === 'equipe') && currentUserRole !== 'PROPRIETARIO') {
+                alert('Acesso Restrito ao Proprietário!');
+                return;
+            }
+
+            // Update tab contents visibility
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+
+            // Update navigation button active style
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-gray-800', 'text-white');
+                btn.classList.add('text-gray-300');
+            });
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if (activeNav) {
+                activeNav.classList.add('bg-gray-800', 'text-white');
+            }
+
+            // Update Page Title
+            const titles = {
+                dashboard: 'Dashboard Geral & Indicadores',
+                pdv: 'PDV - Vendas e Balcão',
+                pecas: 'Gestão de Peças e Peças de Moto',
+                motos: 'Compra e Venda de Motos (Novas/Usadas)',
+                os: 'Ordens de Serviço e Oficina',
+                relatorios: 'Relatórios Financeiros Sigilosos',
+                equipe: 'Gestão de Usuários e Permissões'
+            };
+            document.getElementById('current-page-title').innerText = titles[tabId] || 'FREDSON MOTOS';
+
+            // Refresh specific tab contents
+            if (tabId === 'dashboard') renderDashboard();
+            if (tabId === 'pdv') renderPdv();
+            if (tabId === 'pecas') renderPecasTable();
+            if (tabId === 'motos') renderMotosGrid();
+            if (tabId === 'os') renderOsTable();
+            if (tabId === 'relatorios') renderRelatorios();
+
+            lucide.createIcons();
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('-ml-64');
+        }
+
+        // -------------------------------------------------------------
+        // 1. DASHBOARD LOGIC
+        // -------------------------------------------------------------
+        function renderDashboard() {
+            // Calculate totals
+            const todayStr = new Date().toLocaleDateString('pt-BR');
+            const salesToday = vendas.filter(v => v.data.startsWith(todayStr));
+            const totalToday = salesToday.reduce((sum, v) => sum + v.total, 0);
+
+            const totalMotosCount = motos.filter(m => m.status === 'Disponível').length;
+            const totalMotosVal = motos.filter(m => m.status === 'Disponível').reduce((sum, m) => sum + Number(m.venda), 0);
+
+            const lowStockItems = pecas.filter(p => p.tipo !== 'servico' && p.qtd <= 5);
+
+            document.getElementById('dash-faturamento-dia').innerText = `R$ ${totalToday.toFixed(2)}`;
+            document.getElementById('dash-motos-count').innerText = totalMotosCount;
+            document.getElementById('dash-motos-val').innerText = `R$ ${totalMotosVal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('dash-pecas-count').innerText = pecas.length;
+            document.getElementById('dash-alerta-count').innerText = lowStockItems.length;
+
+            // Render Recent Sales Table
+            const recentSalesBody = document.getElementById('dash-recent-sales');
+            recentSalesBody.innerHTML = '';
+
+            const recentList = [...vendas].reverse().slice(0, 5);
+            if (recentList.length === 0) {
+                recentSalesBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500">Nenhuma venda registrada ainda.</td></tr>`;
+            } else {
+                recentList.forEach(v => {
+                    const row = document.createElement('tr');
+                    row.className = "hover:bg-gray-800/40";
+                    row.innerHTML = `
+                        <td class="p-3 font-mono text-gray-400">${v.data}</td>
+                        <td class="p-3"><span class="px-2 py-0.5 rounded text-[10px] bg-emerald-500/10 text-emerald-400 font-bold">VENDA</span></td>
+                        <td class="p-3 font-medium text-white">${v.cliente || 'Cliente Balcão'}</td>
+                        <td class="p-3 text-gray-400">${v.atendente}</td>
+                        <td class="p-3 text-right font-bold text-emerald-400">R$ ${v.total.toFixed(2)}</td>
+                    `;
+                    recentSalesBody.appendChild(row);
+                });
+            }
+
+            // Render Low Stock List
+            const lowStockContainer = document.getElementById('dash-low-stock-list');
+            lowStockContainer.innerHTML = '';
+            if (lowStockItems.length === 0) {
+                lowStockContainer.innerHTML = `<p class="text-xs text-gray-500 text-center py-4">Estoque em dia! Nenhum item em falta.</p>`;
+            } else {
+                lowStockItems.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = "flex items-center justify-between p-2.5 rounded-lg bg-gray-900 border border-red-500/20";
+                    div.innerHTML = `
+                        <div>
+                            <p class="text-xs font-bold text-white">${item.nome}</p>
+                            <p class="text-[10px] text-gray-400">Ref: ${item.codigo} | ${item.marca}</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs font-black text-red-400">${item.qtd} un.</span>
+                        </div>
+                    `;
+                    lowStockContainer.appendChild(div);
+                });
+            }
+        }
+
+        // -------------------------------------------------------------
+        // 2. PDV / BALCÃO LOGIC
+        // -------------------------------------------------------------
+        function setPdvCategory(cat) {
+            activePdvCategory = cat;
+            renderPdv();
+        }
+
+        function renderPdv() {
+            const grid = document.getElementById('pdv-grid');
+            grid.innerHTML = '';
+            const search = document.getElementById('pdv-search').value.toLowerCase();
+
+            const filtered = pecas.filter(p => {
+                const matchCat = activePdvCategory === 'all' || p.tipo === activePdvCategory;
+                const matchText = p.nome.toLowerCase().includes(search) || p.codigo.toLowerCase().includes(search) || p.marca.toLowerCase().includes(search);
+                return matchCat && matchText;
+            });
+
+            filtered.forEach(item => {
+                const isOutOfStock = item.tipo !== 'servico' && item.qtd <= 0;
+                const card = document.createElement('div');
+                card.className = `glass-panel p-3 rounded-xl border border-gray-800 flex flex-col justify-between transition hover:border-brand-yellow ${isOutOfStock ? 'opacity-50' : ''}`;
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-gray-800 text-gray-400">${item.codigo}</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded font-bold ${item.tipo === 'servico' ? 'bg-blue-500/20 text-blue-400' : 'bg-brand-yellow/20 text-brand-yellow'}">
+                                ${item.tipo === 'servico' ? 'SERVIÇO' : 'PEÇA'}
+                            </span>
+                        </div>
+                        <h4 class="font-bold text-xs text-white line-clamp-2">${item.nome}</h4>
+                        <p class="text-[11px] text-gray-400">${item.marca}</p>
+                    </div>
+
+                    <div class="mt-3 flex items-center justify-between pt-2 border-t border-gray-800">
+                        <div>
+                            <span class="text-[10px] text-gray-400 block">${item.tipo !== 'servico' ? 'Estoque: ' + item.qtd : 'Oficina'}</span>
+                            <span class="text-sm font-black text-emerald-400">R$ ${Number(item.price).toFixed(2)}</span>
+                        </div>
+                        <button onclick="addToCart(${item.id})" ${isOutOfStock ? 'disabled' : ''} class="px-3 py-1.5 bg-brand-yellow hover:bg-brand-hover text-black rounded-lg text-xs font-bold transition flex items-center gap-1 shadow">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            renderCart();
+            lucide.createIcons();
+        }
+
+        function filterPdvItems() {
+            renderPdv();
+        }
+
+        function addToCart(itemId) {
+            const item = pecas.find(p => p.id === itemId);
+            if (!item) return;
+
+            const existing = currentCart.find(c => c.id === itemId);
+            if (existing) {
+                if (item.tipo !== 'servico' && existing.qtd + 1 > item.qtd) {
+                    alert('Quantidade excede o estoque disponível!');
+                    return;
+                }
+                existing.qtd += 1;
+            } else {
+                currentCart.push({
+                    id: item.id,
+                    codigo: item.codigo,
+                    nome: item.nome,
+                    price: Number(item.price),
+                    cost: Number(item.cost),
+                    tipo: item.tipo,
+                    qtd: 1
+                });
+            }
+            renderCart();
+        }
+
+        function removeFromCart(index) {
+            currentCart.splice(index, 1);
+            renderCart();
+        }
+
+        function updateCartQty(index, newQty) {
+            const val = parseInt(newQty);
+            if (isNaN(val) || val <= 0) return;
+            const cartItem = currentCart[index];
+            const stockItem = pecas.find(p => p.id === cartItem.id);
+
+            if (stockItem && stockItem.tipo !== 'servico' && val > stockItem.qtd) {
+                alert('Quantidade excede o estoque disponível!');
+                renderCart();
+                return;
+            }
+            cartItem.qtd = val;
+            renderCart();
+        }
+
+        function clearCart() {
+            currentCart = [];
+            document.getElementById('pdv-cliente-nome').value = '';
+            document.getElementById('cart-discount').value = 0;
+            renderCart();
+        }
+
+        function renderCart() {
+            const container = document.getElementById('pdv-cart-items');
+            container.innerHTML = '';
+
+            if (currentCart.length === 0) {
+                container.innerHTML = `<p class="text-xs text-gray-500 text-center py-8">Nenhum item no carrinho.</p>`;
+            } else {
+                currentCart.forEach((item, idx) => {
+                    const row = document.createElement('div');
+                    row.className = "flex items-center justify-between bg-gray-900 p-2 rounded-lg text-xs";
+                    row.innerHTML = `
+                        <div class="flex-1 pr-2">
+                            <p class="font-bold text-white line-clamp-1">${item.nome}</p>
+                            <span class="text-[10px] text-emerald-400 font-semibold">R$ ${item.price.toFixed(2)} un.</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="number" min="1" value="${item.qtd}" onchange="updateCartQty(${idx}, this.value)" class="w-12 bg-gray-800 border border-gray-700 rounded text-center text-xs py-0.5 text-white">
+                            <span class="font-bold text-white text-xs w-16 text-right">R$ ${(item.price * item.qtd).toFixed(2)}</span>
+                            <button onclick="removeFromCart(${idx})" class="text-red-400 hover:text-red-300 p-1">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                            </button>
+                        </div>
+                    `;
+                    container.appendChild(row);
+                });
+            }
+
+            updateCartTotals();
+            lucide.createIcons();
+        }
+
+        function updateCartTotals() {
+            const subtotal = currentCart.reduce((sum, item) => sum + (item.price * item.qtd), 0);
+            const discount = parseFloat(document.getElementById('cart-discount').value) || 0;
+            const total = Math.max(0, subtotal - discount);
+
+            document.getElementById('cart-subtotal').innerText = `R$ ${subtotal.toFixed(2)}`;
+            document.getElementById('cart-total').innerText = `R$ ${total.toFixed(2)}`;
+        }
+
+        function finalizeSale() {
+            if (currentCart.length === 0) {
+                alert('Adicione ao menos um item no carrinho para finalizar!');
+                return;
+            }
+
+            const cliente = document.getElementById('pdv-cliente-nome').value.trim() || 'Cliente Balcão';
+            const desconto = parseFloat(document.getElementById('cart-discount').value) || 0;
+            const pagto = document.getElementById('cart-payment-method').value;
+            const subtotal = currentCart.reduce((sum, item) => sum + (item.price * item.qtd), 0);
+            const total = Math.max(0, subtotal - desconto);
+
+            // Deduct stock for parts
+            currentCart.forEach(cItem => {
+                const stockItem = pecas.find(p => p.id === cItem.id);
+                if (stockItem && stockItem.tipo !== 'servico') {
+                    stockItem.qtd -= cItem.qtd;
+                }
+            });
+
+            // Create Venda Record
+            const saleRecord = {
+                id: 'VND-' + Math.floor(100000 + Math.random() * 900000),
+                data: new Date().toLocaleString('pt-BR'),
+                cliente: cliente,
+                atendente: currentUserRole === 'PROPRIETARIO' ? 'Fredson (Dono)' : 'Funcionário',
+                itens: [...currentCart],
+                subtotal: subtotal,
+                desconto: desconto,
+                total: total,
+                pagto: pagto
+            };
+
+            vendas.push(saleRecord);
+            saveData();
+
+            // Open Receipt Modal
+            showReceiptModal(saleRecord);
+
+            // Reset PDV
+            clearCart();
+            renderPdv();
+        }
+
+        function showReceiptModal(sale) {
+            document.getElementById('rec-date').innerText = sale.data;
+            document.getElementById('rec-id').innerText = sale.id;
+            document.getElementById('rec-cliente').innerText = sale.cliente;
+            document.getElementById('rec-atendente').innerText = sale.atendente;
+            document.getElementById('rec-subtotal').innerText = `R$ ${sale.subtotal.toFixed(2)}`;
+            document.getElementById('rec-desconto').innerText = `R$ ${sale.desconto.toFixed(2)}`;
+            document.getElementById('rec-total').innerText = `R$ ${sale.total.toFixed(2)}`;
+            document.getElementById('rec-pagto').innerText = sale.pagto;
+
+            const itemsContainer = document.getElementById('rec-items-list');
+            itemsContainer.innerHTML = '';
+            sale.itens.forEach(it => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="py-1">${it.nome}</td>
+                    <td class="py-1 text-center">${it.qtd}</td>
+                    <td class="py-1 text-right">R$ ${(it.price * it.qtd).toFixed(2)}</td>
+                `;
+                itemsContainer.appendChild(tr);
+            });
+
+            document.getElementById('modal-receipt').classList.remove('hidden');
+        }
+
+        // -------------------------------------------------------------
+        // 3. GESTÃO DE PEÇAS
+        // -------------------------------------------------------------
+        function renderPecasTable() {
+            const tbody = document.getElementById('pecas-table-body');
+            tbody.innerHTML = '';
+
+            const query = document.getElementById('pecas-search-input').value.toLowerCase();
+            const filtered = pecas.filter(p => p.nome.toLowerCase().includes(query) || p.codigo.toLowerCase().includes(query) || p.marca.toLowerCase().includes(query));
+
+            filtered.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-800/40";
+                tr.innerHTML = `
+                    <td class="p-3 font-mono text-gray-400 text-xs">${p.codigo}</td>
+                    <td class="p-3 font-bold text-white">${p.nome}</td>
+                    <td class="p-3 text-gray-300 text-xs">${p.marca}</td>
+                    <td class="p-3 text-right font-bold ${p.qtd <= 5 && p.tipo !== 'servico' ? 'text-red-400' : 'text-gray-200'}">
+                        ${p.tipo === 'servico' ? '∞' : p.qtd}
+                    </td>
+                    <td class="p-3 text-right text-gray-400 text-xs">R$ ${Number(p.cost).toFixed(2)}</td>
+                    <td class="p-3 text-right font-bold text-emerald-400">R$ ${Number(p.price).toFixed(2)}</td>
+                    <td class="p-3 text-center space-x-2">
+                        <button onclick="editPeca(${p.id})" class="p-1 text-brand-yellow hover:text-white">
+                            <i data-lucide="edit" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="deletePeca(${p.id})" class="p-1 text-red-400 hover:text-red-300">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        function openPecaModal(peca = null) {
+            document.getElementById('form-peca').reset();
+            if (peca) {
+                document.getElementById('modal-peca-title').innerText = 'Editar Peça / Item';
+                document.getElementById('peca-id').value = peca.id;
+                document.getElementById('peca-codigo').value = peca.codigo;
+                document.getElementById('peca-nome').value = peca.nome;
+                document.getElementById('peca-marca').value = peca.marca;
+                document.getElementById('peca-qtd').value = peca.qtd;
+                document.getElementById('peca-cost').value = peca.cost;
+                document.getElementById('peca-price').value = peca.price;
+            } else {
+                document.getElementById('modal-peca-title').innerText = 'Cadastrar Nova Peça';
+                document.getElementById('peca-id').value = '';
+            }
+            document.getElementById('modal-peca').classList.remove('hidden');
+        }
+
+        function editPeca(id) {
+            const p = pecas.find(item => item.id === id);
+            if (p) openPecaModal(p);
+        }
+
+        function deletePeca(id) {
+            if (confirm('Tem certeza que deseja excluir este item?')) {
+                pecas = pecas.filter(p => p.id !== id);
+                saveData();
+                renderPecasTable();
+            }
+        }
+
+        function savePeca(e) {
+            e.preventDefault();
+            const id = document.getElementById('peca-id').value;
+            const newPeca = {
+                id: id ? parseInt(id) : Date.now(),
+                codigo: document.getElementById('peca-codigo').value.trim(),
+                nome: document.getElementById('peca-nome').value.trim(),
+                marca: document.getElementById('peca-marca').value.trim(),
+                qtd: parseInt(document.getElementById('peca-qtd').value),
+                cost: parseFloat(document.getElementById('peca-cost').value),
+                price: parseFloat(document.getElementById('peca-price').value),
+                tipo: 'peca'
+            };
+
+            if (id) {
+                const idx = pecas.findIndex(p => p.id === parseInt(id));
+                if (idx !== -1) pecas[idx] = newPeca;
+            } else {
+                pecas.push(newPeca);
+            }
+
+            saveData();
+            closeModal('modal-peca');
+            renderPecasTable();
+        }
+
+        // -------------------------------------------------------------
+        // 4. COMPRA E VENDA DE MOTOS
+        // -------------------------------------------------------------
+        function renderMotosGrid() {
+            const container = document.getElementById('motos-grid');
+            container.innerHTML = '';
+            const statusFilter = document.getElementById('motos-filter-status').value;
+
+            const filtered = motos.filter(m => statusFilter === 'ALL' || m.status === statusFilter);
+
+            filtered.forEach(m => {
+                const isVendida = m.status === 'Vendida';
+                const card = document.createElement('div');
+                card.className = "glass-panel p-4 rounded-xl border border-gray-800 flex flex-col justify-between";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${m.condicao === 'Nova 0km' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-brand-yellow'}">
+                                ${m.condicao}
+                            </span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isVendida ? 'bg-gray-800 text-gray-400' : (m.status === 'Em Manutenção' ? 'bg-red-500/20 text-red-400' : 'bg-blue-500/20 text-blue-400')}">
+                                ${m.status}
+                            </span>
+                        </div>
+                        <h3 class="font-extrabold text-base text-white">${m.marca} ${m.modelo}</h3>
+                        <p class="text-xs text-gray-400 mt-0.5">Ano: ${m.ano} | Cor: ${m.cor}</p>
+                        <div class="mt-3 p-2 bg-gray-900/80 rounded-lg space-y-1 text-xs">
+                            <div class="flex justify-between"><span class="text-gray-500">Placa:</span> <span class="font-mono text-gray-200">${m.placa}</span></div>
+                            <div class="flex justify-between"><span class="text-gray-500">Chassi:</span> <span class="font-mono text-gray-400 text-[10px]">${m.chassi || 'N/A'}</span></div>
+                            ${currentUserRole === 'PROPRIETARIO' ? `<div class="flex justify-between pt-1 border-t border-gray-800"><span class="text-gray-500">Valor Compra:</span> <span class="text-gray-400">R$ ${Number(m.compra).toFixed(2)}</span></div>` : ''}
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-gray-800 flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] text-gray-400 block">Preço de Venda</span>
+                            <span class="text-lg font-black text-brand-yellow">R$ ${Number(m.venda).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                        </div>
+                        <div class="flex gap-2">
+                            ${!isVendida ? `<button onclick="venderMotoDirect(${m.id})" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs">Vender</button>` : ''}
+                            <button onclick="editMoto(${m.id})" class="p-1.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg">
+                                <i data-lucide="edit" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function openMotoModal(moto = null) {
+            document.getElementById('form-moto').reset();
+            if (moto) {
+                document.getElementById('modal-moto-title').innerText = 'Editar Registro de Moto';
+                document.getElementById('moto-id').value = moto.id;
+                document.getElementById('moto-marca').value = moto.marca;
+                document.getElementById('moto-modelo').value = moto.modelo;
+                document.getElementById('moto-ano').value = moto.ano;
+                document.getElementById('moto-cor').value = moto.cor;
+                document.getElementById('moto-condicao').value = moto.condicao;
+                document.getElementById('moto-placa').value = moto.placa;
+                document.getElementById('moto-chassi').value = moto.chassi;
+                document.getElementById('moto-compra').value = moto.compra;
+                document.getElementById('moto-venda').value = moto.venda;
+                document.getElementById('moto-status').value = moto.status;
+            } else {
+                document.getElementById('modal-moto-title').innerText = 'Cadastrar Moto (Compra/Entrada)';
+                document.getElementById('moto-id').value = '';
+            }
+            document.getElementById('modal-moto').classList.remove('hidden');
+        }
+
+        function editMoto(id) {
+            const m = motos.find(item => item.id === id);
+            if (m) openMotoModal(m);
+        }
+
+        function saveMoto(e) {
+            e.preventDefault();
+            const id = document.getElementById('moto-id').value;
+            const newMoto = {
+                id: id ? parseInt(id) : Date.now(),
+                marca: document.getElementById('moto-marca').value.trim(),
+                modelo: document.getElementById('moto-modelo').value.trim(),
+                ano: document.getElementById('moto-ano').value.trim(),
+                cor: document.getElementById('moto-cor').value.trim(),
+                condicao: document.getElementById('moto-condicao').value,
+                placa: document.getElementById('moto-placa').value.trim(),
+                chassi: document.getElementById('moto-chassi').value.trim(),
+                compra: parseFloat(document.getElementById('moto-compra').value),
+                venda: parseFloat(document.getElementById('moto-venda').value),
+                status: document.getElementById('moto-status').value
+            };
+
+            if (id) {
+                const idx = motos.findIndex(m => m.id === parseInt(id));
+                if (idx !== -1) motos[idx] = newMoto;
+            } else {
+                motos.push(newMoto);
+            }
+
+            saveData();
+            closeModal('modal-moto');
+            renderMotosGrid();
+        }
+
+        function venderMotoDirect(motoId) {
+            const moto = motos.find(m => m.id === motoId);
+            if (!moto) return;
+            const cliente = prompt('Nome do Comprador da Moto:', '');
+            if (cliente === null) return;
+
+            moto.status = 'Vendida';
+
+            // Add sales record
+            const saleRecord = {
+                id: 'MOTO-' + Math.floor(100000 + Math.random() * 900000),
+                data: new Date().toLocaleString('pt-BR'),
+                cliente: cliente || 'Cliente Moto',
+                atendente: currentUserRole === 'PROPRIETARIO' ? 'Fredson (Dono)' : 'Funcionário',
+                itens: [{
+                    id: moto.id,
+                    codigo: moto.placa,
+                    nome: `MOTO: ${moto.marca} ${moto.modelo} (${moto.ano})`,
+                    price: Number(moto.venda),
+                    cost: Number(moto.compra),
+                    tipo: 'moto',
+                    qtd: 1
+                }],
+                subtotal: Number(moto.venda),
+                desconto: 0,
+                total: Number(moto.venda),
+                pagto: 'Transferência / PIX'
+            };
+
+            vendas.push(saleRecord);
+            saveData();
+            renderMotosGrid();
+            showReceiptModal(saleRecord);
+        }
+
+        // -------------------------------------------------------------
+        // 5. ORDENS DE SERVIÇO (OS)
+        // -------------------------------------------------------------
+        function renderOsTable() {
+            const tbody = document.getElementById('os-table-body');
+            tbody.innerHTML = '';
+
+            ordensServico.forEach(os => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-800/40";
+                tr.innerHTML = `
+                    <td class="p-3 font-mono font-bold text-brand-yellow text-xs">#${os.id}</td>
+                    <td class="p-3">
+                        <p class="font-bold text-white text-xs">${os.cliente}</p>
+                        <p class="text-[10px] text-gray-400">${os.fone}</p>
+                    </td>
+                    <td class="p-3">
+                        <p class="text-xs text-gray-200">${os.moto}</p>
+                        <span class="text-[10px] font-mono text-gray-400">${os.placa}</span>
+                    </td>
+                    <td class="p-3 text-xs text-gray-300 max-w-xs truncate">${os.descricao}</td>
+                    <td class="p-3">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${os.status === 'Concluído' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-brand-yellow'}">
+                            ${os.status}
+                        </span>
+                    </td>
+                    <td class="p-3 text-right font-bold text-emerald-400">R$ ${Number(os.valor).toFixed(2)}</td>
+                    <td class="p-3 text-center space-x-2">
+                        <button onclick="editOs(${os.id})" class="p-1 text-brand-yellow hover:text-white">
+                            <i data-lucide="edit" class="w-4 h-4"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        function openOsModal(os = null) {
+            document.getElementById('form-os').reset();
+            if (os) {
+                document.getElementById('modal-os-title').innerText = 'Editar Ordem de Serviço';
+                document.getElementById('os-id').value = os.id;
+                document.getElementById('os-cliente').value = os.cliente;
+                document.getElementById('os-fone').value = os.fone;
+                document.getElementById('os-moto').value = os.moto;
+                document.getElementById('os-placa').value = os.placa;
+                document.getElementById('os-descricao').value = os.descricao;
+                document.getElementById('os-valor').value = os.valor;
+                document.getElementById('os-status').value = os.status;
+            } else {
+                document.getElementById('modal-os-title').innerText = 'Nova Ordem de Serviço (O.S.)';
+                document.getElementById('os-id').value = '';
+            }
+            document.getElementById('modal-os').classList.remove('hidden');
+        }
+
+        function editOs(id) {
+            const os = ordensServico.find(item => item.id === id);
+            if (os) openOsModal(os);
+        }
+
+        function saveOs(e) {
+            e.preventDefault();
+            const id = document.getElementById('os-id').value;
+            const newOs = {
+                id: id ? parseInt(id) : Math.floor(500 + Math.random() * 500),
+                cliente: document.getElementById('os-cliente').value.trim(),
+                fone: document.getElementById('os-fone').value.trim(),
+                moto: document.getElementById('os-moto').value.trim(),
+                placa: document.getElementById('os-placa').value.trim(),
+                descricao: document.getElementById('os-descricao').value.trim(),
+                valor: parseFloat(document.getElementById('os-valor').value),
+                status: document.getElementById('os-status').value
+            };
+
+            if (id) {
+                const idx = ordensServico.findIndex(o => o.id === parseInt(id));
+                if (idx !== -1) ordensServico[idx] = newOs;
+            } else {
+                ordensServico.push(newOs);
+            }
+
+            saveData();
+            closeModal('modal-os');
+            renderOsTable();
+        }
+
+        // -------------------------------------------------------------
+        // 6. RELATÓRIOS FINANCEIROS
+        // -------------------------------------------------------------
+        function renderRelatorios() {
+            const totalFaturado = vendas.reduce((sum, v) => sum + v.total, 0);
+
+            // Estimation of Profit based on cost
+            let lucroEst = 0;
+            vendas.forEach(v => {
+                v.itens.forEach(it => {
+                    const cost = it.cost || 0;
+                    lucroEst += (it.price - cost) * it.qtd;
+                });
+            });
+
+            document.getElementById('rel-total-faturado').innerText = `R$ ${totalFaturado.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('rel-lucro-estimado').innerText = `R$ ${lucroEst.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('rel-qtd-vendas').innerText = vendas.length;
+
+            const tbody = document.getElementById('rel-historico-body');
+            tbody.innerHTML = '';
+
+            [...vendas].reverse().forEach(v => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-800/40";
+                tr.innerHTML = `
+                    <td class="p-2.5 font-mono text-brand-yellow">${v.id}</td>
+                    <td class="p-2.5 font-mono text-gray-400">${v.data}</td>
+                    <td class="p-2.5 font-semibold text-white">${v.cliente}</td>
+                    <td class="p-2.5 text-gray-300">${v.pagto}</td>
+                    <td class="p-2.5 text-gray-400">${v.atendente}</td>
+                    <td class="p-2.5 text-right font-bold text-emerald-400">R$ ${v.total.toFixed(2)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // UTILS
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
